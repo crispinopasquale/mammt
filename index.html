@@ -3,62 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkateShop Pro - E-commerce Skateboard</title>
+    <title>3D T-Shirt Customizer</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/controls/OrbitControls.js"></script>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
-                <i class="fas fa-skating"></i>
-                <span>SkateShop Pro</span>
+                <i class="fas fa-tshirt"></i>
+                <span>3D T-Shirt Designer</span>
             </div>
             
-            <div class="nav-menu" id="navMenu">
-                <a href="#" class="nav-link active" data-page="home">Home</a>
-                <a href="#" class="nav-link" data-page="products">Prodotti</a>
-                <a href="#" class="nav-link" data-page="categories">Categorie</a>
-                <a href="#" class="nav-link" data-page="about">Chi Siamo</a>
-            </div>
-
             <div class="nav-actions">
-                <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Cerca prodotti..." class="search-input">
-                    <button class="search-btn" onclick="searchProducts()">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-                
-                <button class="cart-btn" onclick="toggleCart()">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count" id="cartCount">0</span>
+                <button class="btn-primary" onclick="exportDesign()">
+                    <i class="fas fa-download"></i>
+                    Esporta Design
                 </button>
-                
-                <div class="user-menu">
-                    <button class="user-btn" onclick="toggleUserMenu()" id="userBtn">
-                        <i class="fas fa-user"></i>
-                    </button>
-                    <div class="user-dropdown" id="userDropdown">
-                        <div class="user-info" id="userInfo" style="display: none;">
-                            <span id="userName">Utente</span>
-                            <small id="userEmail">email@example.com</small>
-                        </div>
-                        <div class="auth-buttons" id="authButtons">
-                            <button onclick="showLoginModal()">Accedi</button>
-                            <button onclick="showRegisterModal()">Registrati</button>
-                        </div>
-                        <div class="user-actions" id="userActions" style="display: none;">
-                            <a href="#" onclick="showProfile()">Profilo</a>
-                            <a href="#" onclick="showOrders()">I Miei Ordini</a>
-                            <a href="#" onclick="logout()">Logout</a>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-                    <i class="fas fa-bars"></i>
+                <button class="btn-secondary" onclick="resetDesign()">
+                    <i class="fas fa-undo"></i>
+                    Reset
                 </button>
             </div>
         </div>
@@ -66,264 +33,103 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Home Page -->
-        <div class="page" id="homePage">
-            <!-- Hero Section -->
-            <section class="hero">
-                <div class="hero-content">
-                    <h1>Benvenuto in SkateShop Pro</h1>
-                    <p>La tua destinazione per skateboard di qualità, accessori e tutto ciò che serve per il tuo stile di vita skate</p>
-                    <div class="hero-actions">
-                        <button class="btn-primary" onclick="showPage('products')">Scopri i Prodotti</button>
-                        <button class="btn-secondary" onclick="scrollToFeatured()">Prodotti in Evidenza</button>
+        <div class="customizer-container">
+            <!-- 3D Viewer -->
+            <div class="viewer-section">
+                <div class="viewer-container">
+                    <canvas id="tshirtCanvas"></canvas>
+                    <div class="viewer-controls">
+                        <div class="control-group">
+                            <label>Colore T-Shirt:</label>
+                            <div class="color-picker">
+                                <input type="color" id="tshirtColor" value="#ffffff" onchange="changeTshirtColor(this.value)">
+                                <div class="color-presets">
+                                    <div class="color-preset" style="background: #ffffff" onclick="changeTshirtColor('#ffffff')"></div>
+                                    <div class="color-preset" style="background: #000000" onclick="changeTshirtColor('#000000')"></div>
+                                    <div class="color-preset" style="background: #ff0066" onclick="changeTshirtColor('#ff0066')"></div>
+                                    <div class="color-preset" style="background: #00ffff" onclick="changeTshirtColor('#00ffff')"></div>
+                                    <div class="color-preset" style="background: #ffff00" onclick="changeTshirtColor('#ffff00')"></div>
+                                    <div class="color-preset" style="background: #00ff00" onclick="changeTshirtColor('#00ff00')"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label>Vista:</label>
+                            <div class="view-buttons">
+                                <button class="view-btn active" onclick="setView('front')" data-view="front">Fronte</button>
+                                <button class="view-btn" onclick="setView('back')" data-view="back">Retro</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="hero-image">
-                    <img src="https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=600&h=400&fit=crop" alt="Skateboard Hero">
-                </div>
-            </section>
-
-            <!-- Featured Products -->
-            <section class="featured-section" id="featuredSection">
-                <div class="section-header">
-                    <h2>Prodotti in Evidenza</h2>
-                    <p>I migliori skateboard selezionati per te</p>
-                </div>
-                <div class="products-grid" id="featuredProducts">
-                    <!-- Featured products will be loaded here -->
-                </div>
-            </section>
-
-            <!-- Categories -->
-            <section class="categories-section">
-                <div class="section-header">
-                    <h2>Categorie</h2>
-                    <p>Trova quello che cerchi</p>
-                </div>
-                <div class="categories-grid">
-                    <div class="category-card" onclick="filterByCategory('Complete Boards')">
-                        <i class="fas fa-skating"></i>
-                        <h3>Complete Boards</h3>
-                        <p>Skateboard completi pronti all'uso</p>
-                    </div>
-                    <div class="category-card" onclick="filterByCategory('Deck Only')">
-                        <i class="fas fa-rectangle-wide"></i>
-                        <h3>Solo Deck</h3>
-                        <p>Tavole per personalizzare il tuo setup</p>
-                    </div>
-                    <div class="category-card" onclick="filterByCategory('Trucks')">
-                        <i class="fas fa-screwdriver-wrench"></i>
-                        <h3>Trucks</h3>
-                        <p>Assi di qualità per ogni stile</p>
-                    </div>
-                    <div class="category-card" onclick="filterByCategory('Wheels')">
-                        <i class="fas fa-circle"></i>
-                        <h3>Ruote</h3>
-                        <p>Ruote per ogni superficie</p>
-                    </div>
-                    <div class="category-card" onclick="filterByCategory('Bearings')">
-                        <i class="fas fa-gear"></i>
-                        <h3>Cuscinetti</h3>
-                        <p>Precisione e velocità</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- Products Page -->
-        <div class="page" id="productsPage" style="display: none;">
-            <div class="products-header">
-                <h1>Tutti i Prodotti</h1>
-                <div class="products-controls">
-                    <div class="filters">
-                        <select id="categoryFilter" onchange="applyFilters()">
-                            <option value="all">Tutte le Categorie</option>
-                        </select>
-                        <select id="brandFilter" onchange="applyFilters()">
-                            <option value="all">Tutti i Brand</option>
-                        </select>
-                        <select id="sortFilter" onchange="applyFilters()">
-                            <option value="">Ordina per</option>
-                            <option value="price-low">Prezzo: Basso → Alto</option>
-                            <option value="price-high">Prezzo: Alto → Basso</option>
-                            <option value="rating">Valutazione</option>
-                            <option value="newest">Più Recenti</option>
-                        </select>
-                    </div>
+                <div class="instructions">
+                    <p><i class="fas fa-mouse"></i> Trascina per ruotare • <i class="fas fa-scroll"></i> Scroll per zoom</p>
                 </div>
             </div>
-            <div class="products-grid" id="allProducts">
-                <!-- All products will be loaded here -->
-            </div>
-        </div>
 
-        <!-- Categories Page -->
-        <div class="page" id="categoriesPage" style="display: none;">
-            <h1>Categorie</h1>
-            <div class="categories-list">
-                <!-- Categories will be loaded here -->
-            </div>
-        </div>
+            <!-- Graphics Panel -->
+            <div class="graphics-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-images"></i> Grafiche</h2>
+                </div>
+                
+                <div class="upload-section">
+                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Carica la tua grafica PNG</p>
+                        <small>Supporta trasparenza (PNG con canale alfa)</small>
+                    </div>
+                    <input type="file" id="fileInput" accept=".png,.jpg,.jpeg" style="display: none;" onchange="handleFileUpload(event)">
+                </div>
 
-        <!-- About Page -->
-        <div class="page" id="aboutPage" style="display: none;">
-            <div class="about-content">
-                <h1>Chi Siamo</h1>
-                <p>SkateShop Pro è il punto di riferimento per tutti gli appassionati di skateboard. Offriamo prodotti di alta qualità dai migliori brand del settore.</p>
-                <div class="about-features">
-                    <div class="feature">
-                        <i class="fas fa-shipping-fast"></i>
-                        <h3>Spedizione Veloce</h3>
-                        <p>Consegna in 24-48 ore</p>
+                <div class="graphics-library">
+                    <h3>Grafiche Predefinite</h3>
+                    <div class="graphics-grid" id="graphicsGrid">
+                        <!-- Graphics will be loaded here -->
                     </div>
-                    <div class="feature">
-                        <i class="fas fa-shield-alt"></i>
-                        <h3>Garanzia</h3>
-                        <p>Prodotti garantiti</p>
+                </div>
+
+                <div class="selected-graphic" id="selectedGraphic" style="display: none;">
+                    <h3>Grafica Selezionata</h3>
+                    <div class="graphic-controls">
+                        <div class="control-row">
+                            <label>Dimensione:</label>
+                            <input type="range" id="graphicScale" min="0.1" max="2" step="0.1" value="1" onchange="updateGraphicScale(this.value)">
+                            <span id="scaleValue">1.0</span>
+                        </div>
+                        <div class="control-row">
+                            <label>Rotazione:</label>
+                            <input type="range" id="graphicRotation" min="0" max="360" step="1" value="0" onchange="updateGraphicRotation(this.value)">
+                            <span id="rotationValue">0°</span>
+                        </div>
+                        <div class="control-row">
+                            <label>Opacità:</label>
+                            <input type="range" id="graphicOpacity" min="0" max="1" step="0.1" value="1" onchange="updateGraphicOpacity(this.value)">
+                            <span id="opacityValue">100%</span>
+                        </div>
+                        <div class="control-buttons">
+                            <button class="btn-danger" onclick="removeSelectedGraphic()">
+                                <i class="fas fa-trash"></i>
+                                Rimuovi
+                            </button>
+                        </div>
                     </div>
-                    <div class="feature">
-                        <i class="fas fa-headset"></i>
-                        <h3>Supporto</h3>
-                        <p>Assistenza clienti dedicata</p>
+                </div>
+
+                <div class="applied-graphics">
+                    <h3>Grafiche Applicate</h3>
+                    <div class="graphics-list" id="appliedGraphicsList">
+                        <!-- Applied graphics will be listed here -->
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Shopping Cart Sidebar -->
-    <div class="cart-sidebar" id="cartSidebar">
-        <div class="cart-header">
-            <h3>Carrello</h3>
-            <button class="close-cart" onclick="toggleCart()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="cart-content" id="cartContent">
-            <div class="empty-cart" id="emptyCart">
-                <i class="fas fa-shopping-cart"></i>
-                <p>Il tuo carrello è vuoto</p>
-            </div>
-        </div>
-        <div class="cart-footer" id="cartFooter" style="display: none;">
-            <div class="cart-total">
-                <span>Totale: €<span id="cartTotal">0.00</span></span>
-            </div>
-            <button class="checkout-btn" onclick="proceedToCheckout()">
-                Procedi al Checkout
-            </button>
-        </div>
-    </div>
-
-    <!-- Product Modal -->
-    <div class="modal" id="productModal">
-        <div class="modal-content product-modal-content">
-            <span class="close" onclick="closeProductModal()">&times;</span>
-            <div class="product-modal-body" id="productModalBody">
-                <!-- Product details will be loaded here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Auth Modals -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content auth-modal">
-            <span class="close" onclick="closeAuthModals()">&times;</span>
-            <div class="auth-form">
-                <h2>Accedi</h2>
-                <form id="loginForm" onsubmit="login(event)">
-                    <div class="form-group">
-                        <input type="email" id="loginEmail" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="loginPassword" placeholder="Password" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Accedi</button>
-                </form>
-                <p>Non hai un account? <a href="#" onclick="showRegisterModal()">Registrati</a></p>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="registerModal">
-        <div class="modal-content auth-modal">
-            <span class="close" onclick="closeAuthModals()">&times;</span>
-            <div class="auth-form">
-                <h2>Registrati</h2>
-                <form id="registerForm" onsubmit="register(event)">
-                    <div class="form-group">
-                        <input type="text" id="registerName" placeholder="Nome completo" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" id="registerEmail" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="registerPassword" placeholder="Password" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Registrati</button>
-                </form>
-                <p>Hai già un account? <a href="#" onclick="showLoginModal()">Accedi</a></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Checkout Modal -->
-    <div class="modal" id="checkoutModal">
-        <div class="modal-content checkout-modal">
-            <span class="close" onclick="closeCheckoutModal()">&times;</span>
-            <div class="checkout-content">
-                <h2>Checkout</h2>
-                <form id="checkoutForm" onsubmit="placeOrder(event)">
-                    <div class="checkout-section">
-                        <h3>Indirizzo di Spedizione</h3>
-                        <div class="form-row">
-                            <input type="text" id="shippingName" placeholder="Nome completo" required>
-                            <input type="text" id="shippingPhone" placeholder="Telefono" required>
-                        </div>
-                        <input type="text" id="shippingAddress" placeholder="Indirizzo" required>
-                        <div class="form-row">
-                            <input type="text" id="shippingCity" placeholder="Città" required>
-                            <input type="text" id="shippingZip" placeholder="CAP" required>
-                        </div>
-                    </div>
-                    
-                    <div class="checkout-section">
-                        <h3>Metodo di Pagamento</h3>
-                        <div class="payment-methods">
-                            <label>
-                                <input type="radio" name="paymentMethod" value="card" checked>
-                                <span>Carta di Credito</span>
-                            </label>
-                            <label>
-                                <input type="radio" name="paymentMethod" value="paypal">
-                                <span>PayPal</span>
-                            </label>
-                            <label>
-                                <input type="radio" name="paymentMethod" value="cash">
-                                <span>Contrassegno</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="order-summary">
-                        <h3>Riepilogo Ordine</h3>
-                        <div id="checkoutItems"></div>
-                        <div class="order-total">
-                            <strong>Totale: €<span id="checkoutTotal">0.00</span></strong>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary checkout-submit">
-                        Conferma Ordine
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Loading Spinner -->
-    <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+    <div class="loading-spinner" id="loadingSpinner" style="display: flex;">
         <div class="spinner"></div>
+        <p>Caricamento modello 3D...</p>
     </div>
 
     <!-- Notification -->

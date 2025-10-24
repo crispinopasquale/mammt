@@ -1,779 +1,507 @@
-// SkateShop Pro - E-commerce JavaScript
+// 3D T-Shirt Customizer
+let scene, camera, renderer, tshirt, controls;
+let appliedGraphics = [];
+let selectedGraphic = null;
+let currentView = 'front';
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let isDragging = false;
 
-// Global variables
-let currentUser = null;
-let products = [];
-let cart = [];
-let currentPage = 'home';
-let isLoggedIn = false;
-
-// API Configuration
-const API_BASE = window.location.origin;
+// Predefined graphics
+const predefinedGraphics = [
+    { name: 'Logo 1', url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkYwMDY2Ii8+Cjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TE9HTzwvdGV4dD4KPC9zdmc+' },
+    { name: 'Stella', url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik01MCAyTDU4IDM4SDk4TDY2IDYyTDc0IDk4TDUwIDc0TDI2IDk4TDM0IDYyTDIgMzhINDJMNTAgMloiIGZpbGw9IiMwMEZGRkYiLz4KPC9zdmc+' },
+    { name: 'Cuore', url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik01MCAyNUMyNSAxMCAxMCAyNSAxMCA0MEM5IDY1IDUwIDkwIDUwIDkwUzkyIDY1IDkwIDQwQzkwIDI1IDc1IDEwIDUwIDI1WiIgZmlsbD0iI0ZGMzMzMyIvPgo8L3N2Zz4=' },
+    { name: 'Fulmine', url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik02MCAyTDIwIDQ1SDQwTDM1IDk4TDc1IDU1SDU1TDYwIDJaIiBmaWxsPSIjRkZGRjAwIi8+Cjwvc3ZnPg==' },
+    { name: 'Smile', url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQ1IiBmaWxsPSIjRkZEQjAwIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSIzNSIgY3k9IjQwIiByPSI1IiBmaWxsPSIjMzMzIi8+CjxjaXJjbGUgY3g9IjY1IiBjeT0iNDAiIHI9IjUiIGZpbGw9IiMzMzMiLz4KPHBhdGggZD0iTTMwIDY1UzQwIDc1IDUwIDc1UzY5IDY1IDcwIDY1IiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPg==' },
+    { name: 'Diamante', url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik01MCA1TDgwIDM1TDUwIDk1TDIwIDM1TDUwIDVaIiBmaWxsPSJ1cmwoI2dyYWQpIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMiIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwRkZGRjtzdG9wLW9wYWNpdHk6MSIgLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojRkYwMDY2O3N0b3Atb3BhY2l0eToxIiAvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPg==' }
+];
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
+    initThreeJS();
+    loadPredefinedGraphics();
     setupEventListeners();
-    checkAuthStatus();
-    loadProducts();
+    
+    // Hide loading spinner after initialization
+    setTimeout(() => {
+        document.getElementById('loadingSpinner').style.display = 'none';
+    }, 1000);
 });
 
-// Initialize application
-function initializeApp() {
-    showPage('home');
-    updateCartUI();
-    loadFeaturedProducts();
+// Initialize Three.js scene
+function initThreeJS() {
+    const canvas = document.getElementById('tshirtCanvas');
+    const container = canvas.parentElement;
+    
+    // Scene setup
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x2a2a2a);
+    
+    // Camera setup
+    camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(0, 0, 3);
+    
+    // Renderer setup
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 5, 5);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+    
+    const fillLight = new THREE.DirectionalLight(0x00ffff, 0.3);
+    fillLight.position.set(-5, 0, 2);
+    scene.add(fillLight);
+    
+    // Create T-shirt geometry
+    createTshirt();
+    
+    // Controls
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.minDistance = 2;
+    controls.maxDistance = 8;
+    controls.maxPolarAngle = Math.PI;
+    
+    // Handle window resize
+    window.addEventListener('resize', onWindowResize);
+    
+    // Mouse events for graphic interaction
+    canvas.addEventListener('mousedown', onMouseDown);
+    canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('mouseup', onMouseUp);
+    
+    // Start render loop
+    animate();
+}
+
+// Create T-shirt 3D model
+function createTshirt() {
+    const tshirtGroup = new THREE.Group();
+    
+    // Main body
+    const bodyGeometry = new THREE.BoxGeometry(2, 2.5, 0.1);
+    const bodyMaterial = new THREE.MeshLambertMaterial({ 
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.95
+    });
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    body.receiveShadow = true;
+    tshirtGroup.add(body);
+    
+    // Sleeves
+    const sleeveGeometry = new THREE.BoxGeometry(0.8, 0.6, 0.1);
+    const sleeveMaterial = new THREE.MeshLambertMaterial({ 
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.95
+    });
+    
+    const leftSleeve = new THREE.Mesh(sleeveGeometry, sleeveMaterial);
+    leftSleeve.position.set(-1.4, 0.8, 0);
+    leftSleeve.receiveShadow = true;
+    tshirtGroup.add(leftSleeve);
+    
+    const rightSleeve = new THREE.Mesh(sleeveGeometry, sleeveMaterial);
+    rightSleeve.position.set(1.4, 0.8, 0);
+    rightSleeve.receiveShadow = true;
+    tshirtGroup.add(rightSleeve);
+    
+    // Collar
+    const collarGeometry = new THREE.CylinderGeometry(0.3, 0.35, 0.15, 16);
+    const collarMaterial = new THREE.MeshLambertMaterial({ 
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.95
+    });
+    const collar = new THREE.Mesh(collarGeometry, collarMaterial);
+    collar.position.set(0, 1.1, 0);
+    collar.rotation.x = Math.PI / 2;
+    collar.receiveShadow = true;
+    tshirtGroup.add(collar);
+    
+    tshirt = tshirtGroup;
+    tshirt.userData = { graphics: [] };
+    scene.add(tshirt);
+}
+
+// Load predefined graphics
+function loadPredefinedGraphics() {
+    const graphicsGrid = document.getElementById('graphicsGrid');
+    
+    predefinedGraphics.forEach((graphic, index) => {
+        const graphicElement = document.createElement('div');
+        graphicElement.className = 'graphic-item';
+        graphicElement.innerHTML = `<img src="${graphic.url}" alt="${graphic.name}" title="${graphic.name}">`;
+        graphicElement.addEventListener('click', () => selectPredefinedGraphic(graphic, index));
+        graphicsGrid.appendChild(graphicElement);
+    });
 }
 
 // Setup event listeners
 function setupEventListeners() {
-    // Navigation
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const page = link.getAttribute('data-page');
-            showPage(page);
-        });
+    // File input
+    document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+    
+    // Color picker
+    document.getElementById('tshirtColor').addEventListener('change', (e) => {
+        changeTshirtColor(e.target.value);
     });
-
-    // Search
-    document.getElementById('searchInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            searchProducts();
-        }
+    
+    // Graphic controls
+    document.getElementById('graphicScale').addEventListener('input', (e) => {
+        updateGraphicScale(e.target.value);
     });
-
-    // Close modals when clicking outside
-    window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-            closeAllModals();
-        }
+    
+    document.getElementById('graphicRotation').addEventListener('input', (e) => {
+        updateGraphicRotation(e.target.value);
     });
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.user-menu')) {
-            closeUserMenu();
-        }
+    
+    document.getElementById('graphicOpacity').addEventListener('input', (e) => {
+        updateGraphicOpacity(e.target.value);
     });
 }
 
-// Authentication functions
-function checkAuthStatus() {
-    const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('userData');
+// Handle file upload
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
     
-    if (token && userData) {
-        try {
-            currentUser = JSON.parse(userData);
-            isLoggedIn = true;
-            updateAuthUI();
-            loadCart();
-        } catch (error) {
-            console.error('Error parsing user data:', error);
-            logout();
-        }
-    }
-}
-
-function updateAuthUI() {
-    const authButtons = document.getElementById('authButtons');
-    const userActions = document.getElementById('userActions');
-    const userInfo = document.getElementById('userInfo');
-    const userName = document.getElementById('userName');
-    const userEmail = document.getElementById('userEmail');
-
-    if (isLoggedIn && currentUser) {
-        authButtons.style.display = 'none';
-        userActions.style.display = 'block';
-        userInfo.style.display = 'block';
-        userName.textContent = currentUser.name;
-        userEmail.textContent = currentUser.email;
-    } else {
-        authButtons.style.display = 'block';
-        userActions.style.display = 'none';
-        userInfo.style.display = 'none';
-    }
-}
-
-async function login(event) {
-    event.preventDefault();
-    
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    showLoading(true);
-    
-    try {
-        const response = await fetch(`${API_BASE}/api/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            localStorage.setItem('authToken', data.token);
-            localStorage.setItem('userData', JSON.stringify(data.user));
-            currentUser = data.user;
-            isLoggedIn = true;
-            updateAuthUI();
-            closeAuthModals();
-            showNotification('Login effettuato con successo!', 'success');
-            loadCart();
-        } else {
-            showNotification(data.message || 'Errore durante il login', 'error');
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        showNotification('Errore di connessione', 'error');
-    } finally {
-        showLoading(false);
-    }
-}
-
-async function register(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    
-    showLoading(true);
-    
-    try {
-        const response = await fetch(`${API_BASE}/api/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, email, password })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            localStorage.setItem('authToken', data.token);
-            localStorage.setItem('userData', JSON.stringify(data.user));
-            currentUser = data.user;
-            isLoggedIn = true;
-            updateAuthUI();
-            closeAuthModals();
-            showNotification('Registrazione completata con successo!', 'success');
-            loadCart();
-        } else {
-            showNotification(data.message || 'Errore durante la registrazione', 'error');
-        }
-    } catch (error) {
-        console.error('Register error:', error);
-        showNotification('Errore di connessione', 'error');
-    } finally {
-        showLoading(false);
-    }
-}
-
-function logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    currentUser = null;
-    isLoggedIn = false;
-    cart = [];
-    updateAuthUI();
-    updateCartUI();
-    showNotification('Logout effettuato con successo!', 'success');
-    showPage('home');
-}
-
-// Product functions
-async function loadProducts() {
-    try {
-        const response = await fetch(`${API_BASE}/api/products`);
-        const data = await response.json();
-        
-        if (response.ok) {
-            products = data.products;
-            updateFilters(data.categories, data.brands);
-            displayProducts(products);
-        } else {
-            console.error('Error loading products:', data.message);
-        }
-    } catch (error) {
-        console.error('Error loading products:', error);
-    }
-}
-
-async function loadFeaturedProducts() {
-    try {
-        const response = await fetch(`${API_BASE}/api/products?featured=true&limit=6`);
-        const data = await response.json();
-        
-        if (response.ok) {
-            displayFeaturedProducts(data.products);
-        }
-    } catch (error) {
-        console.error('Error loading featured products:', error);
-    }
-}
-
-function displayProducts(productsToShow) {
-    const container = document.getElementById('allProducts');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    productsToShow.forEach(product => {
-        const productCard = createProductCard(product);
-        container.appendChild(productCard);
-    });
-}
-
-function displayFeaturedProducts(productsToShow) {
-    const container = document.getElementById('featuredProducts');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    productsToShow.forEach(product => {
-        const productCard = createProductCard(product);
-        container.appendChild(productCard);
-    });
-}
-
-function createProductCard(product) {
-    const card = document.createElement('div');
-    card.className = 'product-card fade-in';
-    
-    const discount = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
-    
-    card.innerHTML = `
-        <div class="product-image-container">
-            <img src="${product.image}" alt="${product.name}" class="product-image">
-            ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
-            ${!product.inStock ? '<div class="out-of-stock-badge">Esaurito</div>' : ''}
-        </div>
-        <div class="product-info">
-            <div class="product-brand">${product.brand}</div>
-            <h3>${product.name}</h3>
-            <div class="product-price">
-                <span class="current-price">€${product.price.toFixed(2)}</span>
-                ${product.originalPrice ? `<span class="original-price">€${product.originalPrice.toFixed(2)}</span>` : ''}
-            </div>
-            <div class="product-rating">
-                <div class="stars">${generateStars(product.rating)}</div>
-                <span class="rating-text">(${product.reviews})</span>
-            </div>
-            <div class="product-actions">
-                <button class="add-to-cart-btn" onclick="addToCart('${product.id}')" ${!product.inStock ? 'disabled' : ''}>
-                    <i class="fas fa-shopping-cart"></i>
-                    ${!product.inStock ? 'Esaurito' : 'Aggiungi al Carrello'}
-                </button>
-                <button class="quick-view-btn" onclick="showProductModal('${product.id}')">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-        </div>
-    `;
-    
-    return card;
-}
-
-function generateStars(rating) {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    let starsHTML = '';
-    
-    for (let i = 0; i < fullStars; i++) {
-        starsHTML += '<i class="fas fa-star"></i>';
-    }
-    
-    if (hasHalfStar) {
-        starsHTML += '<i class="fas fa-star-half-alt"></i>';
-    }
-    
-    const emptyStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < emptyStars; i++) {
-        starsHTML += '<i class="far fa-star"></i>';
-    }
-    
-    return starsHTML;
-}
-
-function updateFilters(categories, brands) {
-    const categoryFilter = document.getElementById('categoryFilter');
-    const brandFilter = document.getElementById('brandFilter');
-    
-    if (categoryFilter) {
-        categoryFilter.innerHTML = '<option value="all">Tutte le Categorie</option>';
-        categories.forEach(category => {
-            categoryFilter.innerHTML += `<option value="${category}">${category}</option>`;
-        });
-    }
-    
-    if (brandFilter) {
-        brandFilter.innerHTML = '<option value="all">Tutti i Brand</option>';
-        brands.forEach(brand => {
-            brandFilter.innerHTML += `<option value="${brand}">${brand}</option>`;
-        });
-    }
-}
-
-async function applyFilters() {
-    const category = document.getElementById('categoryFilter').value;
-    const brand = document.getElementById('brandFilter').value;
-    const sort = document.getElementById('sortFilter').value;
-    
-    let url = `${API_BASE}/api/products?`;
-    
-    if (category !== 'all') url += `category=${encodeURIComponent(category)}&`;
-    if (brand !== 'all') url += `brand=${encodeURIComponent(brand)}&`;
-    if (sort) url += `sort=${sort}&`;
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (response.ok) {
-            displayProducts(data.products);
-        }
-    } catch (error) {
-        console.error('Error applying filters:', error);
-    }
-}
-
-function filterByCategory(category) {
-    showPage('products');
-    setTimeout(() => {
-        const categoryFilter = document.getElementById('categoryFilter');
-        if (categoryFilter) {
-            categoryFilter.value = category;
-            applyFilters();
-        }
-    }, 100);
-}
-
-async function searchProducts() {
-    const searchTerm = document.getElementById('searchInput').value.trim();
-    
-    if (!searchTerm) return;
-    
-    try {
-        const response = await fetch(`${API_BASE}/api/products?search=${encodeURIComponent(searchTerm)}`);
-        const data = await response.json();
-        
-        if (response.ok) {
-            showPage('products');
-            setTimeout(() => {
-                displayProducts(data.products);
-            }, 100);
-        }
-    } catch (error) {
-        console.error('Error searching products:', error);
-    }
-}
-
-// Product Modal
-async function showProductModal(productId) {
-    try {
-        const response = await fetch(`${API_BASE}/api/products/${productId}`);
-        const product = await response.json();
-        
-        if (response.ok) {
-            displayProductModal(product);
-        }
-    } catch (error) {
-        console.error('Error loading product details:', error);
-    }
-}
-
-function displayProductModal(product) {
-    const modal = document.getElementById('productModal');
-    const modalBody = document.getElementById('productModalBody');
-    
-    const discount = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
-    
-    modalBody.innerHTML = `
-        <div class="product-modal-images">
-            <img src="${product.image}" alt="${product.name}" class="main-product-image" id="mainProductImage">
-            ${product.images && product.images.length > 1 ? `
-                <div class="product-thumbnails">
-                    ${product.images.map((img, index) => `
-                        <img src="${img}" alt="${product.name}" class="thumbnail ${index === 0 ? 'active' : ''}" 
-                             onclick="changeMainImage('${img}', this)">
-                    `).join('')}
-                </div>
-            ` : ''}
-        </div>
-        <div class="product-modal-info">
-            <div class="product-modal-brand">${product.brand}</div>
-            <h2>${product.name}</h2>
-            <div class="product-modal-price">
-                <span class="current-price">€${product.price.toFixed(2)}</span>
-                ${product.originalPrice ? `<span class="original-price">€${product.originalPrice.toFixed(2)}</span>` : ''}
-                ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
-            </div>
-            <div class="product-modal-rating">
-                <div class="stars">${generateStars(product.rating)}</div>
-                <span class="reviews">(${product.reviews} recensioni)</span>
-            </div>
-            <div class="product-description">
-                <p>${product.description}</p>
-            </div>
-            ${product.features ? `
-                <div class="product-features">
-                    <h4>Caratteristiche:</h4>
-                    <ul>
-                        ${product.features.map(feature => `<li>${feature}</li>`).join('')}
-                    </ul>
-                </div>
-            ` : ''}
-            <div class="stock-info">
-                ${product.inStock ? 
-                    `<span class="in-stock"><i class="fas fa-check"></i> Disponibile (${product.stock} pezzi)</span>` :
-                    `<span class="out-of-stock"><i class="fas fa-times"></i> Esaurito</span>`
-                }
-            </div>
-            <div class="product-modal-actions">
-                <button class="btn-primary" onclick="addToCart('${product.id}')" ${!product.inStock ? 'disabled' : ''}>
-                    <i class="fas fa-shopping-cart"></i>
-                    ${!product.inStock ? 'Esaurito' : 'Aggiungi al Carrello'}
-                </button>
-            </div>
-        </div>
-    `;
-    
-    modal.classList.add('active');
-}
-
-function changeMainImage(imageSrc, thumbnail) {
-    document.getElementById('mainProductImage').src = imageSrc;
-    document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
-    thumbnail.classList.add('active');
-}
-
-function closeProductModal() {
-    document.getElementById('productModal').classList.remove('active');
-}
-
-// Cart functions
-async function addToCart(productId) {
-    if (!isLoggedIn) {
-        showLoginModal();
-        showNotification('Effettua il login per aggiungere prodotti al carrello', 'warning');
+    if (!file.type.startsWith('image/')) {
+        showNotification('Per favore seleziona un file immagine valido', 'error');
         return;
     }
     
-    try {
-        const response = await fetch(`${API_BASE}/api/cart/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-            },
-            body: JSON.stringify({ productId, quantity: 1 })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            showNotification('Prodotto aggiunto al carrello!', 'success');
-            loadCart();
-        } else {
-            showNotification(data.message || 'Errore durante l\'aggiunta al carrello', 'error');
-        }
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        showNotification('Errore di connessione', 'error');
-    }
-}
-
-async function loadCart() {
-    if (!isLoggedIn) return;
-    
-    try {
-        const response = await fetch(`${API_BASE}/api/cart`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            cart = data.items;
-            updateCartUI();
-        }
-    } catch (error) {
-        console.error('Error loading cart:', error);
-    }
-}
-
-function updateCartUI() {
-    const cartCount = document.getElementById('cartCount');
-    const cartContent = document.getElementById('cartContent');
-    const cartFooter = document.getElementById('cartFooter');
-    const emptyCart = document.getElementById('emptyCart');
-    const cartTotal = document.getElementById('cartTotal');
-    
-    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-    
-    cartCount.textContent = itemCount;
-    
-    if (cart.length === 0) {
-        emptyCart.style.display = 'block';
-        cartFooter.style.display = 'none';
-        cartContent.innerHTML = '<div class="empty-cart"><i class="fas fa-shopping-cart"></i><p>Il tuo carrello è vuoto</p></div>';
-    } else {
-        emptyCart.style.display = 'none';
-        cartFooter.style.display = 'block';
-        cartTotal.textContent = total.toFixed(2);
-        
-        cartContent.innerHTML = cart.map(item => `
-            <div class="cart-item">
-                <img src="${item.product.image}" alt="${item.product.name}" class="cart-item-image">
-                <div class="cart-item-info">
-                    <h4>${item.product.name}</h4>
-                    <p>${item.product.brand}</p>
-                    <div class="cart-item-price">€${item.product.price.toFixed(2)}</div>
-                </div>
-                <div class="cart-item-controls">
-                    <button class="quantity-btn" onclick="updateCartItemQuantity('${item.id}', ${item.quantity - 1})">-</button>
-                    <span class="quantity-display">${item.quantity}</span>
-                    <button class="quantity-btn" onclick="updateCartItemQuantity('${item.id}', ${item.quantity + 1})">+</button>
-                    <button class="remove-item" onclick="removeFromCart('${item.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-}
-
-async function updateCartItemQuantity(itemId, newQuantity) {
-    if (newQuantity <= 0) {
-        removeFromCart(itemId);
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${API_BASE}/api/cart/update/${itemId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-            },
-            body: JSON.stringify({ quantity: newQuantity })
-        });
-        
-        if (response.ok) {
-            loadCart();
-        }
-    } catch (error) {
-        console.error('Error updating cart item:', error);
-    }
-}
-
-async function removeFromCart(itemId) {
-    try {
-        const response = await fetch(`${API_BASE}/api/cart/remove/${itemId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-            }
-        });
-        
-        if (response.ok) {
-            showNotification('Prodotto rimosso dal carrello', 'success');
-            loadCart();
-        }
-    } catch (error) {
-        console.error('Error removing from cart:', error);
-    }
-}
-
-function toggleCart() {
-    const cartSidebar = document.getElementById('cartSidebar');
-    cartSidebar.classList.toggle('active');
-}
-
-// Checkout functions
-function proceedToCheckout() {
-    if (cart.length === 0) {
-        showNotification('Il carrello è vuoto', 'warning');
-        return;
-    }
-    
-    showCheckoutModal();
-}
-
-function showCheckoutModal() {
-    const modal = document.getElementById('checkoutModal');
-    const checkoutItems = document.getElementById('checkoutItems');
-    const checkoutTotal = document.getElementById('checkoutTotal');
-    
-    const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-    
-    checkoutItems.innerHTML = cart.map(item => `
-        <div class="checkout-item">
-            <span>${item.product.name} x ${item.quantity}</span>
-            <span>€${(item.product.price * item.quantity).toFixed(2)}</span>
-        </div>
-    `).join('');
-    
-    checkoutTotal.textContent = total.toFixed(2);
-    modal.classList.add('active');
-}
-
-async function placeOrder(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const shippingAddress = {
-        name: formData.get('shippingName') || document.getElementById('shippingName').value,
-        phone: formData.get('shippingPhone') || document.getElementById('shippingPhone').value,
-        address: formData.get('shippingAddress') || document.getElementById('shippingAddress').value,
-        city: formData.get('shippingCity') || document.getElementById('shippingCity').value,
-        zip: formData.get('shippingZip') || document.getElementById('shippingZip').value
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const imageUrl = e.target.result;
+        addGraphicToTshirt(imageUrl, file.name);
     };
+    reader.readAsDataURL(file);
+}
+
+// Select predefined graphic
+function selectPredefinedGraphic(graphic, index) {
+    // Remove previous selection
+    document.querySelectorAll('.graphic-item').forEach(item => {
+        item.classList.remove('selected');
+    });
     
-    const paymentMethod = formData.get('paymentMethod') || document.querySelector('input[name="paymentMethod"]:checked').value;
+    // Select current
+    document.querySelectorAll('.graphic-item')[index].classList.add('selected');
     
-    showLoading(true);
-    
-    try {
-        const response = await fetch(`${API_BASE}/api/orders`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-            },
-            body: JSON.stringify({
-                shippingAddress,
-                paymentMethod
-            })
+    addGraphicToTshirt(graphic.url, graphic.name);
+}
+
+// Add graphic to t-shirt
+function addGraphicToTshirt(imageUrl, name) {
+    const loader = new THREE.TextureLoader();
+    loader.load(imageUrl, (texture) => {
+        // Create graphic mesh
+        const graphicGeometry = new THREE.PlaneGeometry(0.5, 0.5);
+        const graphicMaterial = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+            side: THREE.DoubleSide
         });
         
-        const data = await response.json();
+        const graphicMesh = new THREE.Mesh(graphicGeometry, graphicMaterial);
         
-        if (response.ok) {
-            showNotification('Ordine effettuato con successo!', 'success');
-            closeCheckoutModal();
-            toggleCart();
-            cart = [];
-            updateCartUI();
-            
-            // Show order confirmation
-            setTimeout(() => {
-                alert(`Ordine #${data.order.id} confermato!\nTotale: €${data.order.total}\nRiceverai una email di conferma.`);
-            }, 500);
+        // Position on front of t-shirt
+        graphicMesh.position.set(0, 0, 0.06);
+        graphicMesh.userData = {
+            id: Date.now(),
+            name: name,
+            originalScale: 1,
+            originalRotation: 0,
+            originalOpacity: 1,
+            view: currentView
+        };
+        
+        tshirt.add(graphicMesh);
+        appliedGraphics.push(graphicMesh);
+        
+        // Select this graphic
+        selectGraphic(graphicMesh);
+        
+        // Update UI
+        updateAppliedGraphicsList();
+        showNotification(`Grafica "${name}" aggiunta con successo!`, 'success');
+    }, undefined, (error) => {
+        showNotification('Errore nel caricamento della grafica', 'error');
+        console.error('Error loading texture:', error);
+    });
+}
+
+// Select graphic for editing
+function selectGraphic(graphic) {
+    selectedGraphic = graphic;
+    
+    // Update controls
+    const selectedGraphicPanel = document.getElementById('selectedGraphic');
+    selectedGraphicPanel.style.display = 'block';
+    
+    // Update control values
+    document.getElementById('graphicScale').value = graphic.scale?.x || 1;
+    document.getElementById('scaleValue').textContent = (graphic.scale?.x || 1).toFixed(1);
+    
+    document.getElementById('graphicRotation').value = (graphic.rotation.z * 180 / Math.PI) || 0;
+    document.getElementById('rotationValue').textContent = Math.round(graphic.rotation.z * 180 / Math.PI) + '°';
+    
+    document.getElementById('graphicOpacity').value = graphic.material.opacity || 1;
+    document.getElementById('opacityValue').textContent = Math.round((graphic.material.opacity || 1) * 100) + '%';
+    
+    // Highlight in applied graphics list
+    updateAppliedGraphicsList();
+}
+
+// Update graphic scale
+function updateGraphicScale(value) {
+    if (!selectedGraphic) return;
+    
+    const scale = parseFloat(value);
+    selectedGraphic.scale.set(scale, scale, 1);
+    document.getElementById('scaleValue').textContent = scale.toFixed(1);
+    updateAppliedGraphicsList();
+}
+
+// Update graphic rotation
+function updateGraphicRotation(value) {
+    if (!selectedGraphic) return;
+    
+    const rotation = parseFloat(value) * Math.PI / 180;
+    selectedGraphic.rotation.z = rotation;
+    document.getElementById('rotationValue').textContent = Math.round(parseFloat(value)) + '°';
+    updateAppliedGraphicsList();
+}
+
+// Update graphic opacity
+function updateGraphicOpacity(value) {
+    if (!selectedGraphic) return;
+    
+    const opacity = parseFloat(value);
+    selectedGraphic.material.opacity = opacity;
+    document.getElementById('opacityValue').textContent = Math.round(opacity * 100) + '%';
+    updateAppliedGraphicsList();
+}
+
+// Remove selected graphic
+function removeSelectedGraphic() {
+    if (!selectedGraphic) return;
+    
+    tshirt.remove(selectedGraphic);
+    appliedGraphics = appliedGraphics.filter(g => g !== selectedGraphic);
+    
+    selectedGraphic = null;
+    document.getElementById('selectedGraphic').style.display = 'none';
+    
+    updateAppliedGraphicsList();
+    showNotification('Grafica rimossa', 'success');
+}
+
+// Update applied graphics list
+function updateAppliedGraphicsList() {
+    const list = document.getElementById('appliedGraphicsList');
+    list.innerHTML = '';
+    
+    if (appliedGraphics.length === 0) {
+        list.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Nessuna grafica applicata</p>';
+        return;
+    }
+    
+    appliedGraphics.forEach((graphic, index) => {
+        const item = document.createElement('div');
+        item.className = `applied-graphic-item ${graphic === selectedGraphic ? 'selected' : ''}`;
+        
+        // Create a small preview canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = 40;
+        canvas.height = 40;
+        const ctx = canvas.getContext('2d');
+        
+        if (graphic.material.map && graphic.material.map.image) {
+            ctx.drawImage(graphic.material.map.image, 0, 0, 40, 40);
         } else {
-            showNotification(data.message || 'Errore durante l\'ordine', 'error');
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, 0, 40, 40);
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('IMG', 20, 25);
         }
-    } catch (error) {
-        console.error('Error placing order:', error);
-        showNotification('Errore di connessione', 'error');
-    } finally {
-        showLoading(false);
-    }
+        
+        item.innerHTML = `
+            <img src="${canvas.toDataURL()}" alt="${graphic.userData.name}">
+            <div class="applied-graphic-info">
+                <h4>${graphic.userData.name}</h4>
+                <p>Scala: ${(graphic.scale.x).toFixed(1)} • Opacità: ${Math.round(graphic.material.opacity * 100)}%</p>
+            </div>
+        `;
+        
+        item.addEventListener('click', () => selectGraphic(graphic));
+        list.appendChild(item);
+    });
 }
 
-function closeCheckoutModal() {
-    document.getElementById('checkoutModal').classList.remove('active');
-}
-
-// Navigation functions
-function showPage(pageName) {
-    // Update navigation
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('data-page') === pageName) {
-            link.classList.add('active');
+// Change t-shirt color
+function changeTshirtColor(color) {
+    if (!tshirt) return;
+    
+    tshirt.children.forEach(child => {
+        if (child.material) {
+            child.material.color.setHex(color.replace('#', '0x'));
         }
     });
     
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(page => {
-        page.style.display = 'none';
+    document.getElementById('tshirtColor').value = color;
+}
+
+// Set view (front/back)
+function setView(view) {
+    currentView = view;
+    
+    // Update button states
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-view') === view) {
+            btn.classList.add('active');
+        }
     });
     
-    // Show selected page
-    const targetPage = document.getElementById(pageName + 'Page');
-    if (targetPage) {
-        targetPage.style.display = 'block';
-        targetPage.classList.add('fade-in');
+    // Rotate camera
+    if (view === 'front') {
+        controls.reset();
+        camera.position.set(0, 0, 3);
+    } else {
+        controls.reset();
+        camera.position.set(0, 0, -3);
+        camera.lookAt(0, 0, 0);
     }
     
-    currentPage = pageName;
+    controls.update();
+}
+
+// Mouse interaction handlers
+function onMouseDown(event) {
+    event.preventDefault();
     
-    // Load page-specific content
-    if (pageName === 'products') {
-        loadProducts();
+    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+    
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(appliedGraphics);
+    
+    if (intersects.length > 0) {
+        const graphic = intersects[0].object;
+        selectGraphic(graphic);
+        isDragging = true;
+        controls.enabled = false;
     }
 }
 
-function scrollToFeatured() {
-    document.getElementById('featuredSection').scrollIntoView({ 
-        behavior: 'smooth' 
-    });
+function onMouseMove(event) {
+    if (!isDragging || !selectedGraphic) return;
+    
+    event.preventDefault();
+    
+    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+    
+    raycaster.setFromCamera(mouse, camera);
+    
+    // Project mouse position onto t-shirt surface
+    const tshirtIntersects = raycaster.intersectObject(tshirt.children[0]); // Main body
+    if (tshirtIntersects.length > 0) {
+        const point = tshirtIntersects[0].point;
+        selectedGraphic.position.x = point.x;
+        selectedGraphic.position.y = point.y;
+        selectedGraphic.position.z = point.z + 0.01;
+    }
 }
 
-// Modal functions
-function showLoginModal() {
-    closeAllModals();
-    document.getElementById('loginModal').classList.add('active');
+function onMouseUp(event) {
+    isDragging = false;
+    controls.enabled = true;
 }
 
-function showRegisterModal() {
-    closeAllModals();
-    document.getElementById('registerModal').classList.add('active');
+// Window resize handler
+function onWindowResize() {
+    const container = document.getElementById('tshirtCanvas').parentElement;
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
 }
 
-function closeAuthModals() {
-    document.getElementById('loginModal').classList.remove('active');
-    document.getElementById('registerModal').classList.remove('active');
+// Animation loop
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
 }
 
-function closeAllModals() {
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.remove('active');
-    });
+// Export design
+function exportDesign() {
+    // Create a higher resolution render for export
+    const exportRenderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    exportRenderer.setSize(1024, 1024);
+    exportRenderer.setClearColor(0x2a2a2a);
+    
+    // Render the scene
+    exportRenderer.render(scene, camera);
+    
+    // Create download link
+    const canvas = exportRenderer.domElement;
+    const link = document.createElement('a');
+    link.download = 'tshirt-design.png';
+    link.href = canvas.toDataURL();
+    link.click();
+    
+    // Cleanup
+    exportRenderer.dispose();
+    
+    showNotification('Design esportato con successo!', 'success');
 }
 
-// User menu functions
-function toggleUserMenu() {
-    const dropdown = document.getElementById('userDropdown');
-    dropdown.classList.toggle('active');
-}
-
-function closeUserMenu() {
-    document.getElementById('userDropdown').classList.remove('active');
-}
-
-function showProfile() {
-    closeUserMenu();
-    showNotification('Funzionalità profilo in sviluppo', 'info');
-}
-
-function showOrders() {
-    closeUserMenu();
-    showNotification('Funzionalità ordini in sviluppo', 'info');
-}
-
-// Mobile menu
-function toggleMobileMenu() {
-    const navMenu = document.getElementById('navMenu');
-    navMenu.classList.toggle('active');
+// Reset design
+function resetDesign() {
+    if (confirm('Sei sicuro di voler resettare tutto il design?')) {
+        // Remove all graphics
+        appliedGraphics.forEach(graphic => {
+            tshirt.remove(graphic);
+        });
+        appliedGraphics = [];
+        selectedGraphic = null;
+        
+        // Reset t-shirt color
+        changeTshirtColor('#ffffff');
+        
+        // Reset view
+        setView('front');
+        
+        // Update UI
+        document.getElementById('selectedGraphic').style.display = 'none';
+        updateAppliedGraphicsList();
+        
+        // Remove selections
+        document.querySelectorAll('.graphic-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        showNotification('Design resettato', 'success');
+    }
 }
 
 // Utility functions
-function showLoading(show) {
-    const spinner = document.getElementById('loadingSpinner');
-    spinner.style.display = show ? 'flex' : 'none';
-}
-
 function showNotification(message, type = 'info') {
     const notification = document.getElementById('notification');
     const notificationText = document.getElementById('notificationText');
@@ -781,10 +509,10 @@ function showNotification(message, type = 'info') {
     notificationText.textContent = message;
     notification.className = `notification show ${type}`;
     
-    // Auto hide after 5 seconds
+    // Auto hide after 3 seconds
     setTimeout(() => {
         closeNotification();
-    }, 5000);
+    }, 3000);
 }
 
 function closeNotification() {
@@ -792,133 +520,28 @@ function closeNotification() {
     notification.classList.remove('show');
 }
 
-// Add some CSS for additional styling
-const additionalStyles = `
-    .discount-badge {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: linear-gradient(135deg, #ff0066, #cc0052);
-        color: white;
-        padding: 5px 10px;
-        border-radius: 15px;
-        font-size: 12px;
-        font-weight: 700;
-        z-index: 1;
-    }
-    
-    .out-of-stock-badge {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: rgba(102, 102, 102, 0.9);
-        color: white;
-        padding: 5px 10px;
-        border-radius: 15px;
-        font-size: 12px;
-        font-weight: 700;
-        z-index: 1;
-    }
-    
-    .product-image-container {
-        position: relative;
-        overflow: hidden;
-        border-radius: 10px;
-        margin-bottom: 15px;
-    }
-    
-    .stock-info {
-        margin: 15px 0;
-        padding: 10px;
-        border-radius: 8px;
-        background: rgba(42, 42, 42, 0.5);
-    }
-    
-    .in-stock {
-        color: #00ffff;
-        font-weight: 600;
-    }
-    
-    .out-of-stock {
-        color: #ff0066;
-        font-weight: 600;
-    }
-    
-    .rating-text {
-        color: #666;
-        font-size: 0.9rem;
-        margin-left: 5px;
-    }
-    
-    .notification.success {
-        border-color: #00ffff;
-    }
-    
-    .notification.error {
-        border-color: #ff0066;
-    }
-    
-    .notification.warning {
-        border-color: #ffa500;
-    }
-    
-    .notification.info {
-        border-color: #666;
-    }
-    
-    .add-to-cart-btn:disabled {
-        background: #666;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-    
-    .add-to-cart-btn:disabled:hover {
-        transform: none;
-        box-shadow: none;
-    }
-    
-    @media (max-width: 768px) {
-        .nav-menu.active {
-            display: flex;
-            position: absolute;
-            top: 70px;
-            left: 0;
-            right: 0;
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(20px);
-            flex-direction: column;
-            padding: 20px;
-            border-bottom: 2px solid #ff0066;
+// Initialize tooltips and help
+function initializeHelp() {
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Delete' && selectedGraphic) {
+            removeSelectedGraphic();
         }
-    }
-`;
-
-// Inject additional styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = additionalStyles;
-document.head.appendChild(styleSheet);
-
-// Initialize cart animation
-function animateCartAdd() {
-    const cartBtn = document.querySelector('.cart-btn');
-    cartBtn.style.transform = 'scale(1.1)';
-    setTimeout(() => {
-        cartBtn.style.transform = 'scale(1)';
-    }, 200);
+        if (e.key === 'Escape') {
+            selectedGraphic = null;
+            document.getElementById('selectedGraphic').style.display = 'none';
+            updateAppliedGraphicsList();
+        }
+    });
 }
 
-// Add scroll effects
-window.addEventListener('scroll', () => {
-    const navbar = document.getElementById('navbar');
-    if (window.scrollY > 100) {
-        navbar.style.background = 'rgba(15, 15, 15, 0.98)';
-    } else {
-        navbar.style.background = 'rgba(15, 15, 15, 0.95)';
-    }
-});
+// Call help initialization
+initializeHelp();
 
-console.log('🛹 SkateShop Pro initialized successfully!');
-console.log('🔧 Backend API:', API_BASE);
-console.log('👤 Demo accounts:');
-console.log('   Admin: admin@skateshop.com / admin123');
-console.log('   User: user@example.com / user123');
+console.log('🎨 3D T-Shirt Customizer loaded successfully!');
+console.log('📝 Instructions:');
+console.log('   • Click on predefined graphics or upload your own PNG files');
+console.log('   • Drag graphics on the t-shirt to reposition them');
+console.log('   • Use the controls panel to adjust size, rotation, and opacity');
+console.log('   • Press Delete to remove selected graphic');
+console.log('   • Press Escape to deselect graphic');
