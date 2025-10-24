@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoveChat - App di Incontri</title>
+    <title>SkateVault - Chat per Collezionisti di Skateboard Vintage</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -12,9 +12,9 @@
         <!-- Sidebar with matches -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <h2><i class="fas fa-heart"></i> LoveChat</h2>
-                <button class="new-match-btn" onclick="findNewMatch()">
-                    <i class="fas fa-search"></i> Trova Match
+                <h2><i class="fas fa-skating"></i> SkateVault</h2>
+                <button class="new-match-btn" onclick="findNewCollector()">
+                    <i class="fas fa-users"></i> Trova Collezionisti
                 </button>
             </div>
             
@@ -30,7 +30,7 @@
                     <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face" 
                          alt="Profile" class="profile-pic" id="currentProfilePic">
                     <div class="profile-details">
-                        <h3 id="currentProfileName">Seleziona una conversazione</h3>
+                        <h3 id="currentProfileName">Seleziona un collezionista</h3>
                         <span class="online-status" id="onlineStatus">Offline</span>
                     </div>
                 </div>
@@ -38,20 +38,20 @@
                     <button class="action-btn" onclick="showProfile()">
                         <i class="fas fa-user"></i>
                     </button>
-                    <button class="action-btn" onclick="videoCall()">
-                        <i class="fas fa-video"></i>
+                    <button class="action-btn" onclick="shareBoard()">
+                        <i class="fas fa-camera"></i>
                     </button>
-                    <button class="action-btn" onclick="phoneCall()">
-                        <i class="fas fa-phone"></i>
+                    <button class="action-btn" onclick="tradingPost()">
+                        <i class="fas fa-exchange-alt"></i>
                     </button>
                 </div>
             </div>
 
             <div class="chat-messages" id="chatMessages">
                 <div class="welcome-message">
-                    <i class="fas fa-heart"></i>
-                    <h3>Benvenuto in LoveChat!</h3>
-                    <p>Seleziona una conversazione dalla lista o trova nuovi match per iniziare a chattare.</p>
+                    <i class="fas fa-skating"></i>
+                    <h3>Benvenuto in SkateVault!</h3>
+                    <p>Connettiti con altri collezionisti di skateboard vintage. Condividi le tue tavole, scambia consigli e fai trading!</p>
                 </div>
             </div>
 
@@ -60,10 +60,14 @@
                     <button class="emoji-btn" onclick="toggleEmojiPicker()">
                         <i class="fas fa-smile"></i>
                     </button>
-                    <input type="text" id="messageInput" placeholder="Scrivi un messaggio..." 
+                    <input type="text" id="messageInput" placeholder="Parla di skateboard vintage..." 
                            onkeypress="handleKeyPress(event)">
-                    <button class="attach-btn" onclick="attachFile()">
-                        <i class="fas fa-paperclip"></i>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                    <button class="attach-btn" onclick="document.getElementById('imageInput').click()">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <button class="quick-btn" onclick="toggleQuickActions()">
+                        <i class="fas fa-bolt"></i>
                     </button>
                     <button class="send-btn" onclick="sendMessage()">
                         <i class="fas fa-paper-plane"></i>
@@ -87,37 +91,49 @@
             <div class="modal-content">
                 <span class="close" onclick="closeNewMatchModal()">&times;</span>
                 <div class="new-match-content">
-                    <h2>Nuovo Match!</h2>
+                    <h2>Nuovo Collezionista!</h2>
                     <div class="match-card" id="newMatchCard">
                         <!-- New match details will be populated by JavaScript -->
                     </div>
                     <div class="match-actions">
-                        <button class="reject-btn" onclick="rejectMatch()">
-                            <i class="fas fa-times"></i> Rifiuta
+                        <button class="reject-btn" onclick="rejectCollector()">
+                            <i class="fas fa-times"></i> Passa
                         </button>
-                        <button class="like-btn" onclick="acceptMatch()">
-                            <i class="fas fa-heart"></i> Mi Piace
+                        <button class="like-btn" onclick="connectCollector()">
+                            <i class="fas fa-handshake"></i> Connetti
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Quick actions -->
+        <div class="quick-actions" id="quickActions">
+            <div class="quick-grid">
+                <button onclick="sendQuickMessage('Che board hai da mostrare? 🛹')">Mostra Board</button>
+                <button onclick="sendQuickMessage('Facciamo uno scambio! 🔄')">Proponi Scambio</button>
+                <button onclick="sendQuickMessage('Quanto l\'hai pagata? 💰')">Chiedi Prezzo</button>
+                <button onclick="sendQuickMessage('Condizione mint? ✨')">Chiedi Condizioni</button>
+                <button onclick="sendQuickMessage('Hai altre foto? 📸')">Chiedi Foto</button>
+                <button onclick="sendQuickMessage('Pazzesco! 🤯')">Complimento</button>
+            </div>
+        </div>
+
         <!-- Emoji picker -->
         <div class="emoji-picker" id="emojiPicker">
             <div class="emoji-grid">
-                <span onclick="addEmoji('😀')">😀</span>
-                <span onclick="addEmoji('😍')">😍</span>
-                <span onclick="addEmoji('🥰')">🥰</span>
-                <span onclick="addEmoji('😘')">😘</span>
-                <span onclick="addEmoji('❤️')">❤️</span>
-                <span onclick="addEmoji('💕')">💕</span>
+                <span onclick="addEmoji('🛹')">🛹</span>
+                <span onclick="addEmoji('🤘')">🤘</span>
                 <span onclick="addEmoji('🔥')">🔥</span>
-                <span onclick="addEmoji('✨')">✨</span>
-                <span onclick="addEmoji('🎉')">🎉</span>
+                <span onclick="addEmoji('💪')">💪</span>
+                <span onclick="addEmoji('⚡')">⚡</span>
+                <span onclick="addEmoji('💀')">💀</span>
+                <span onclick="addEmoji('🎸')">🎸</span>
+                <span onclick="addEmoji('📸')">📸</span>
+                <span onclick="addEmoji('🔄')">🔄</span>
                 <span onclick="addEmoji('👍')">👍</span>
                 <span onclick="addEmoji('😂')">😂</span>
-                <span onclick="addEmoji('🤔')">🤔</span>
+                <span onclick="addEmoji('🤯')">🤯</span>
             </div>
         </div>
     </div>

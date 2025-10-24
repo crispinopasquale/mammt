@@ -20,49 +20,55 @@ const profiles = [
     },
     {
         id: 2,
-        name: "Marco",
+        name: "Lucia 'Thrash' Bianchi",
         age: 28,
-        photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
-        bio: "Sviluppatore software appassionato di musica e sport. Sempre pronto per nuove avventure!",
-        interests: ["Programmazione", "Musica", "Calcio", "Cinema"],
+        photo: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face",
+        bio: "Punk rock skater dal '92. Colleziono deck femminili vintage e grafiche underground. Viva il DIY!",
+        interests: ["Punk Rock", "DIY Graphics", "90s Boards", "Zines"],
         online: false,
         lastSeen: "Visto 2 ore fa",
+        collection: "80+ boards punk/indie",
+        location: "Roma",
         messages: [
-            { text: "Hey! Mi piace molto il tuo profilo 😊", time: "12:15", sent: false },
-            { text: "Grazie! Anche il tuo è interessante. Che tipo di musica ascolti?", time: "12:45", sent: true },
-            { text: "Un po' di tutto, ma ultimamente sono fissato con il jazz. Tu?", time: "13:20", sent: false }
+            { text: "Ehi! Ho visto che hai dei deck Suicidal Tendencies rari 🤘", time: "12:15", sent: false },
+            { text: "Sì! Sono la mia passione. Tu hai qualche pezzo punk rock?", time: "12:45", sent: true },
+            { text: "Ho un Pushead originale del '89, ancora con le ruote originali!", time: "13:20", sent: false }
         ]
     },
     {
         id: 3,
-        name: "Elena",
-        age: 23,
-        photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
-        bio: "Studentessa di arte, amante della natura e degli animali. Cerco qualcuno di autentico e sincero.",
-        interests: ["Arte", "Natura", "Animali", "Lettura"],
+        name: "Tony 'Hawk Eye' Verde",
+        age: 42,
+        photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+        bio: "Veterano dello skate anni '80. Colleziono principalmente Santa Cruz e Independent. Ho skattato con i pro!",
+        interests: ["Santa Cruz", "Independent", "Vert Skating", "Old School"],
         online: true,
         lastSeen: "Online ora",
+        collection: "200+ boards classici",
+        location: "Torino",
         messages: [
-            { text: "Ciao! Che bel tramonto nella tua foto!", time: "16:20", sent: false },
-            { text: "Grazie! L'ho scattata durante un'escursione in montagna", time: "16:22", sent: true },
-            { text: "Fantastico! Anche io adoro la montagna 🏔️", time: "16:25", sent: false },
-            { text: "Dovremmo organizzare un'escursione insieme!", time: "16:27", sent: true }
+            { text: "Bro! Ho visto la tua Santa Cruz Screaming Hand del '85! 🔥", time: "16:20", sent: false },
+            { text: "Quella è la mia reliquia! L'ho comprata nuova nel negozio", time: "16:22", sent: true },
+            { text: "Pazzesco! Io ho ancora i truck Independent Stage 1 originali", time: "16:25", sent: false },
+            { text: "Dobbiamo organizzare una session old school! 🛹", time: "16:27", sent: true }
         ]
     },
     {
         id: 4,
-        name: "Alessandro",
+        name: "Spike 'Ripper' Neri",
         age: 30,
-        photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
-        bio: "Chef professionista, amante del buon cibo e del vino. La vita è troppo breve per non godersi ogni momento!",
-        interests: ["Cucina", "Vino", "Viaggi", "Libri"],
+        photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+        bio: "Hardcore punk skater. Colleziono deck con grafiche controverse e underground. Fuck conformity! ⚡",
+        interests: ["Hardcore Punk", "Underground Art", "Rare Graphics", "Zines"],
         online: false,
         lastSeen: "Visto 1 ora fa",
+        collection: "90+ boards underground",
+        location: "Napoli",
         messages: [
-            { text: "Ciao bella! Ti va di cenare insieme stasera?", time: "19:30", sent: false },
-            { text: "Ciao! Sarebbe bello, ma ho già altri impegni stasera", time: "19:45", sent: true },
-            { text: "Nessun problema! Che ne dici di domani sera?", time: "19:47", sent: false },
-            { text: "Domani sera potrebbe andare bene! 😊", time: "19:50", sent: true }
+            { text: "Yo! Hai mai visto un Natas Kaupas SMA del '89?", time: "19:30", sent: false },
+            { text: "Cazzo sì! È il Santo Graal! Ne ho uno ma è un po' rovinato", time: "19:45", sent: true },
+            { text: "Anche rovinato vale una fortuna! Io cerco da anni", time: "19:47", sent: false },
+            { text: "Se trovo un doppione ti faccio sapere! 🤝", time: "19:50", sent: true }
         ]
     }
 ];
@@ -97,7 +103,7 @@ const potentialMatches = [
 
 // Global variables
 let currentChatId = null;
-let currentPotentialMatch = null;
+let currentPotentialCollector = null;
 let typingTimeout = null;
 
 // Initialize the app
@@ -106,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
 });
 
-// Load matches in sidebar
+// Load collectors in sidebar
 function loadMatches() {
     const matchesList = document.getElementById('matchesList');
     matchesList.innerHTML = '';
@@ -141,17 +147,23 @@ function setupEventListeners() {
             closeModal();
         }
         if (event.target === newMatchModal) {
-            closeNewMatchModal();
+            closeNewCollectorModal();
         }
     };
 
-    // Close emoji picker when clicking outside
+    // Close emoji picker and quick actions when clicking outside
     document.addEventListener('click', function(event) {
         const emojiPicker = document.getElementById('emojiPicker');
         const emojiBtn = document.querySelector('.emoji-btn');
+        const quickActions = document.getElementById('quickActions');
+        const quickBtn = document.querySelector('.quick-btn');
         
         if (!emojiPicker.contains(event.target) && event.target !== emojiBtn) {
             emojiPicker.style.display = 'none';
+        }
+        
+        if (!quickActions.contains(event.target) && event.target !== quickBtn) {
+            quickActions.style.display = 'none';
         }
     });
 }
@@ -204,6 +216,16 @@ function loadMessages(profile) {
 
 // Add a message to the chat
 function addMessageToChat(message, profile) {
+    if (message.image) {
+        addImageMessageToChat(message, profile);
+        return;
+    }
+    
+    if (message.isTrading) {
+        addTradingMessageToChat(message, profile);
+        return;
+    }
+    
     const chatMessages = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${message.sent ? 'sent' : 'received'}`;
@@ -293,14 +315,14 @@ function simulateTyping(profile) {
         
         // Generate auto-response
         const responses = [
-            "Interessante! Dimmi di più 😊",
-            "Haha, sei divertente! 😄",
-            "Sono d'accordo con te!",
-            "Non ci avevo mai pensato così 🤔",
-            "Mi piace il tuo punto di vista!",
-            "Che bella idea! ✨",
-            "Anche io la penso così!",
-            "Raccontami altro! 😍"
+            "Figo! Mandami qualche foto! 📸",
+            "Cazzo che pezzo raro! 🔥",
+            "Anch'io ho quella board!",
+            "Mai visto niente del genere! 🤯",
+            "Quella è una reliquia!",
+            "Quanto l'hai pagata? 💰",
+            "Dobbiamo fare uno scambio!",
+            "La tua collezione è pazzesca! 🛹"
         ];
         
         const randomResponse = responses[Math.floor(Math.random() * responses.length)];
@@ -317,50 +339,54 @@ function simulateTyping(profile) {
     }, 2000 + Math.random() * 2000);
 }
 
-// Find new match
-function findNewMatch() {
-    if (potentialMatches.length === 0) {
-        alert('Non ci sono nuovi match disponibili al momento. Riprova più tardi!');
+// Find new collector
+function findNewCollector() {
+    if (potentialCollectors.length === 0) {
+        alert('Non ci sono nuovi collezionisti disponibili al momento. Riprova più tardi!');
         return;
     }
     
-    // Get random potential match
-    const randomIndex = Math.floor(Math.random() * potentialMatches.length);
-    currentPotentialMatch = potentialMatches[randomIndex];
+    // Get random potential collector
+    const randomIndex = Math.floor(Math.random() * potentialCollectors.length);
+    currentPotentialCollector = potentialCollectors[randomIndex];
     
-    // Show new match modal
-    showNewMatchModal(currentPotentialMatch);
+    // Show new collector modal
+    showNewCollectorModal(currentPotentialCollector);
 }
 
-// Show new match modal
-function showNewMatchModal(match) {
+// Show new collector modal
+function showNewCollectorModal(collector) {
     const modal = document.getElementById('newMatchModal');
     const matchCard = document.getElementById('newMatchCard');
     
     matchCard.innerHTML = `
-        <img src="${match.photo}" alt="${match.name}">
-        <h3>${match.name}, ${match.age}</h3>
-        <p>${match.bio}</p>
+        <img src="${collector.photo}" alt="${collector.name}">
+        <h3>${collector.name}, ${collector.age}</h3>
+        <p>${collector.bio}</p>
+        <div class="collector-info">
+            <span class="collection-tag">📍 ${collector.location}</span>
+            <span class="collection-tag">🛹 ${collector.collection}</span>
+        </div>
         <div class="interests">
-            ${match.interests.map(interest => `<span class="interest-tag">#${interest}</span>`).join(' ')}
+            ${collector.interests.map(interest => `<span class="interest-tag">#${interest}</span>`).join(' ')}
         </div>
     `;
     
     modal.style.display = 'block';
 }
 
-// Accept match
-function acceptMatch() {
-    if (!currentPotentialMatch) return;
+// Connect with collector
+function connectCollector() {
+    if (!currentPotentialCollector) return;
     
     // Add to profiles with initial message
     const newProfile = {
-        ...currentPotentialMatch,
+        ...currentPotentialCollector,
         online: Math.random() > 0.5,
         lastSeen: Math.random() > 0.5 ? 'Online ora' : 'Visto poco fa',
         messages: [
             {
-                text: `Ciao! Siamo in match! 😊 Come va?`,
+                text: `Yo! Siamo connessi! 🤘 Che boards hai da mostrare?`,
                 time: getCurrentTime(),
                 sent: false
             }
@@ -369,66 +395,66 @@ function acceptMatch() {
     
     profiles.unshift(newProfile);
     
-    // Remove from potential matches
-    const index = potentialMatches.findIndex(p => p.id === currentPotentialMatch.id);
+    // Remove from potential collectors
+    const index = potentialCollectors.findIndex(p => p.id === currentPotentialCollector.id);
     if (index > -1) {
-        potentialMatches.splice(index, 1);
+        potentialCollectors.splice(index, 1);
     }
     
-    // Update matches list
+    // Update collectors list
     loadMatches();
     
-    // Show heart animation
-    showHeartAnimation();
+    // Show skate animation
+    showSkateAnimation();
     
     // Close modal
-    closeNewMatchModal();
+    closeNewCollectorModal();
     
     // Auto-open the new chat
     setTimeout(() => {
         openChat(newProfile.id);
     }, 500);
     
-    currentPotentialMatch = null;
+    currentPotentialCollector = null;
 }
 
-// Reject match
-function rejectMatch() {
-    if (!currentPotentialMatch) return;
+// Reject collector
+function rejectCollector() {
+    if (!currentPotentialCollector) return;
     
-    // Remove from potential matches
-    const index = potentialMatches.findIndex(p => p.id === currentPotentialMatch.id);
+    // Remove from potential collectors
+    const index = potentialCollectors.findIndex(p => p.id === currentPotentialCollector.id);
     if (index > -1) {
-        potentialMatches.splice(index, 1);
+        potentialCollectors.splice(index, 1);
     }
     
-    closeNewMatchModal();
-    currentPotentialMatch = null;
+    closeNewCollectorModal();
+    currentPotentialCollector = null;
 }
 
-// Show heart animation
-function showHeartAnimation() {
+// Show skate animation
+function showSkateAnimation() {
     for (let i = 0; i < 5; i++) {
         setTimeout(() => {
-            const heart = document.createElement('div');
-            heart.className = 'heart-animation';
-            heart.innerHTML = '❤️';
-            heart.style.left = Math.random() * window.innerWidth + 'px';
-            heart.style.top = Math.random() * window.innerHeight + 'px';
+            const skate = document.createElement('div');
+            skate.className = 'skate-animation';
+            skate.innerHTML = '🛹';
+            skate.style.left = Math.random() * window.innerWidth + 'px';
+            skate.style.top = Math.random() * window.innerHeight + 'px';
             
-            document.body.appendChild(heart);
+            document.body.appendChild(skate);
             
             setTimeout(() => {
-                document.body.removeChild(heart);
+                document.body.removeChild(skate);
             }, 2000);
         }, i * 200);
     }
 }
 
-// Close new match modal
-function closeNewMatchModal() {
+// Close new collector modal
+function closeNewCollectorModal() {
     document.getElementById('newMatchModal').style.display = 'none';
-    currentPotentialMatch = null;
+    currentPotentialCollector = null;
 }
 
 // Show profile modal
@@ -445,6 +471,10 @@ function showProfile() {
         <img src="${profile.photo}" alt="${profile.name}">
         <h2>${profile.name}, ${profile.age}</h2>
         <p>${profile.bio}</p>
+        <div class="collector-info">
+            <span class="collection-tag">📍 ${profile.location}</span>
+            <span class="collection-tag">🛹 ${profile.collection}</span>
+        </div>
         <div class="profile-stats">
             <div class="stat">
                 <div class="stat-number">${profile.messages.length}</div>
@@ -452,16 +482,23 @@ function showProfile() {
             </div>
             <div class="stat">
                 <div class="stat-number">${profile.interests.length}</div>
-                <div class="stat-label">Interessi</div>
+                <div class="stat-label">Brands</div>
             </div>
             <div class="stat">
-                <div class="stat-number">98%</div>
-                <div class="stat-label">Compatibilità</div>
+                <div class="stat-number">${Math.floor(Math.random() * 20) + 80}%</div>
+                <div class="stat-label">Skate Level</div>
             </div>
         </div>
         <div class="interests">
-            <h4>Interessi:</h4>
+            <h4>Brands Preferiti:</h4>
             ${profile.interests.map(interest => `<span class="interest-tag">#${interest}</span>`).join(' ')}
+        </div>
+        <div class="trading-section">
+            <h4>Trading Status:</h4>
+            <div class="trading-status">
+                <span class="status-tag active">🔄 Disponibile per scambi</span>
+                <span class="status-tag">💰 Compro/Vendo</span>
+            </div>
         </div>
     `;
     
@@ -487,23 +524,187 @@ function addEmoji(emoji) {
     document.getElementById('emojiPicker').style.display = 'none';
 }
 
-// Attach file (placeholder)
-function attachFile() {
-    alert('Funzionalità di allegati in arrivo! 📎');
+// Toggle quick actions
+function toggleQuickActions() {
+    const quickActions = document.getElementById('quickActions');
+    quickActions.style.display = quickActions.style.display === 'block' ? 'none' : 'block';
 }
 
-// Video call (placeholder)
-function videoCall() {
-    if (!currentChatId) return;
-    const profile = profiles.find(p => p.id === currentChatId);
-    alert(`Chiamata video con ${profile.name} in arrivo! 📹`);
+// Send quick message
+function sendQuickMessage(text) {
+    const messageInput = document.getElementById('messageInput');
+    messageInput.value = text;
+    sendMessage();
+    document.getElementById('quickActions').style.display = 'none';
 }
 
-// Phone call (placeholder)
-function phoneCall() {
+// Share skateboard photo
+function shareBoard() {
     if (!currentChatId) return;
     const profile = profiles.find(p => p.id === currentChatId);
-    alert(`Chiamata telefonica con ${profile.name} in arrivo! 📞`);
+    
+    // Simulate image sharing
+    const newMessage = {
+        text: "📷 [Foto condivisa: Powell Peralta Tony Hawk '85]",
+        time: getCurrentTime(),
+        sent: true
+    };
+    
+    profile.messages.push(newMessage);
+    addMessageToChat(newMessage, profile);
+    loadMatches();
+    
+    // Simulate response
+    setTimeout(() => {
+        const response = {
+            text: "Madonna che pezzo! 🔥 Condizione mint?",
+            time: getCurrentTime(),
+            sent: false
+        };
+        profile.messages.push(response);
+        addMessageToChat(response, profile);
+        loadMatches();
+    }, 1500);
+}
+
+// Trading post
+function tradingPost() {
+    if (!currentChatId) return;
+    const profile = profiles.find(p => p.id === currentChatId);
+    
+    // Create trading message
+    const tradingMessage = {
+        text: "🔄 [Proposta di Trading Aperta]\n\n💰 Cosa offri?\n🛹 Cosa cerchi?\n📍 Dove ci troviamo?\n\nScriviamo i dettagli qui sotto! 🤝",
+        time: getCurrentTime(),
+        sent: true,
+        isTrading: true
+    };
+    
+    profile.messages.push(tradingMessage);
+    addTradingMessageToChat(tradingMessage, profile);
+    loadMatches();
+    
+    // Simulate response
+    setTimeout(() => {
+        const response = {
+            text: "Perfetto! Io ho un Powell Peralta del '86 in ottime condizioni. Tu cosa hai da offrire? 🛹",
+            time: getCurrentTime(),
+            sent: false
+        };
+        
+        profile.messages.push(response);
+        addMessageToChat(response, profile);
+        loadMatches();
+    }, 2000);
+}
+
+// Add trading message to chat
+function addTradingMessageToChat(message, profile) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${message.sent ? 'sent' : 'received'} trading-message`;
+    
+    messageDiv.innerHTML = `
+        ${!message.sent ? `<img src="${profile.photo}" alt="${profile.name}" class="message-avatar">` : ''}
+        <div class="message-bubble trading-bubble">
+            <div class="trading-header">
+                <i class="fas fa-exchange-alt"></i>
+                <span>TRADING POST</span>
+            </div>
+            <div class="trading-content">
+                ${message.text.replace(/\n/g, '<br>')}
+            </div>
+            <div class="message-time">${message.time}</div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Handle image upload
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file || !currentChatId) return;
+    
+    const profile = profiles.find(p => p.id === currentChatId);
+    if (!profile) return;
+    
+    // Create a URL for the uploaded image
+    const imageUrl = URL.createObjectURL(file);
+    
+    // Create image message
+    const imageMessage = {
+        text: `📷 [Foto condivisa: ${file.name}]`,
+        time: getCurrentTime(),
+        sent: true,
+        image: imageUrl
+    };
+    
+    profile.messages.push(imageMessage);
+    addImageMessageToChat(imageMessage, profile);
+    loadMatches();
+    
+    // Simulate response
+    setTimeout(() => {
+        const responses = [
+            "Wow! Che board fantastica! 🔥",
+            "Madonna che pezzo raro! 😍",
+            "Condizione perfetta! Quanto l'hai pagata?",
+            "Quella grafica è pazzesca! 🤘",
+            "Hai una collezione incredibile!",
+            "Voglio quella board! Facciamo uno scambio?"
+        ];
+        
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        const response = {
+            text: randomResponse,
+            time: getCurrentTime(),
+            sent: false
+        };
+        
+        profile.messages.push(response);
+        addMessageToChat(response, profile);
+        loadMatches();
+    }, 2000);
+    
+    // Clear the input
+    event.target.value = '';
+}
+
+// Add image message to chat
+function addImageMessageToChat(message, profile) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${message.sent ? 'sent' : 'received'}`;
+    
+    messageDiv.innerHTML = `
+        ${!message.sent ? `<img src="${profile.photo}" alt="${profile.name}" class="message-avatar">` : ''}
+        <div class="message-bubble image-message">
+            <img src="${message.image}" alt="Shared skateboard" class="shared-image" onclick="openImageModal('${message.image}')">
+            <div class="image-caption">${message.text}</div>
+            <div class="message-time">${message.time}</div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Open image in modal
+function openImageModal(imageUrl) {
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    modal.onclick = () => document.body.removeChild(modal);
+    
+    modal.innerHTML = `
+        <div class="image-modal-content">
+            <img src="${imageUrl}" alt="Skateboard photo">
+            <span class="close-image" onclick="document.body.removeChild(this.parentElement.parentElement)">&times;</span>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
 }
 
 // Add some CSS for interest tags
