@@ -1,145 +1,221 @@
-# SkateVault - Chat per Collezionisti di Skateboard Vintage 🛹
+# 🛹 SkateShop Pro - E-commerce Skateboard Completo
 
-Una chat app moderna con estetica punk rock anni '80-'90 dedicata ai collezionisti di skateboard vintage. Connettiti con altri skater, condividi le tue boards, fai trading e vivi la cultura underground!
+Un sito e-commerce completo per skateboard con frontend moderno e backend robusto, sviluppato con tecnologie web moderne.
 
-## 🤘 Caratteristiche Punk Rock
+## 🚀 Caratteristiche Principali
 
-### 💬 Chat Underground
-- Interfaccia di messaggistica con stile punk rock vintage
-- Indicatore di digitazione in tempo reale
-- Emoji picker personalizzato per skater (🛹🤘⚡💀)
-- Quick actions per frasi comuni tra collezionisti
-- Timestamp con font monospace stile hacker
+### Frontend
+- **Design Moderno**: UI cyberpunk con gradienti neon e animazioni fluide
+- **Responsive**: Completamente ottimizzato per desktop, tablet e mobile
+- **Navigazione Intuitiva**: Menu di navigazione con sezioni organizzate
+- **Catalogo Prodotti**: Griglia di prodotti con filtri e ricerca
+- **Carrello Avanzato**: Gestione carrello con aggiornamenti in tempo reale
+- **Autenticazione**: Sistema di login/registrazione integrato
+- **Checkout**: Processo di checkout completo con form di spedizione
 
-### 🛹 Condivisione Boards
-- Upload e condivisione foto delle tue skateboard vintage
-- Visualizzazione immagini in modal full-screen
-- Supporto per tutti i formati immagine
-- Risposte automatiche entusiaste dai collezionisti
+### Backend
+- **API RESTful**: Endpoints completi per tutte le funzionalità
+- **Autenticazione JWT**: Sistema sicuro con token di accesso
+- **Gestione Prodotti**: CRUD completo per prodotti
+- **Sistema Carrello**: Gestione carrello per utenti autenticati
+- **Gestione Ordini**: Sistema completo di ordini con stati
+- **Panel Admin**: Interfaccia amministrativa per gestire il negozio
 
-### 🔄 Sistema di Trading
-- Proposte di scambio integrate nella chat
-- Messaggi speciali per il trading con design distintivo
-- Profili dettagliati con informazioni sulla collezione
-- Status di disponibilità per scambi
-
-### 👥 Profili Collezionisti
-- Informazioni dettagliate su collezione e location
-- Brands preferiti e specializzazioni
-- Statistiche di trading e livello skate
-- Status online/offline con animazioni cyberpunk
-
-### 🎨 Design Cyberpunk Vintage
-- Palette colori neon: cyan (#00ffff) e magenta (#ff0066)
-- Font monospace stile terminal anni '80
-- Animazioni e effetti glow
-- Gradienti e pattern geometrici
-- Estetica dark con accenti luminosi
-
-## 🚀 Come Utilizzare
-
-1. **Aprire l'app**: Apri `index.html` nel browser
-2. **Esplorare i collezionisti**: Clicca sui profili nella sidebar per chattare
-3. **Condividere boards**: Usa il pulsante camera per caricare foto
-4. **Inviare messaggi**: Scrivi o usa le quick actions per frasi comuni
-5. **Fare trading**: Clicca il pulsante scambio per aprire una proposta
-6. **Trovare nuovi collezionisti**: Usa "Trova Collezionisti" per scoprire nuovi profili
+### Pannello Amministrativo
+- **Dashboard**: Statistiche e metriche del negozio
+- **Gestione Prodotti**: Aggiungi, modifica, elimina prodotti
+- **Gestione Ordini**: Visualizza e aggiorna stati degli ordini
+- **Gestione Utenti**: Visualizza informazioni utenti registrati
 
 ## 🛠️ Tecnologie Utilizzate
 
-- **HTML5**: Struttura semantica dell'applicazione
-- **CSS3**: Styling cyberpunk con animazioni, gradienti e effetti neon
-- **JavaScript ES6+**: Logica dell'app e interattività avanzata
-- **Font Awesome**: Icone moderne
-- **Unsplash**: Immagini di profilo
+### Frontend
+- HTML5 semantico
+- CSS3 con Flexbox/Grid
+- JavaScript ES6+ vanilla
+- Font Awesome per le icone
+- Design responsive mobile-first
 
-## 📱 Funzionalità Implementate
+### Backend
+- Node.js
+- Express.js
+- JWT per autenticazione
+- bcryptjs per hash password
+- CORS per richieste cross-origin
+- Multer per upload file
 
-### Chat e Messaggistica
-- ✅ Invio e ricezione messaggi
-- ✅ Upload e condivisione immagini
-- ✅ Quick actions per frasi comuni
-- ✅ Emoji picker personalizzato
-- ✅ Indicatore di digitazione
-- ✅ Scroll automatico
-- ✅ Risposte automatiche contestuali
+## 📦 Installazione e Avvio
 
-### Trading e Collezioni
-- ✅ Sistema di trading integrato
-- ✅ Profili dettagliati collezionisti
-- ✅ Informazioni su collezione e location
-- ✅ Status di disponibilità per scambi
-- ✅ Scoperta nuovi collezionisti
+### Prerequisiti
+- Node.js (versione 14 o superiore)
+- npm o yarn
 
-### UI/UX Punk Rock
-- ✅ Design cyberpunk anni '80-'90
-- ✅ Animazioni neon e glow effects
-- ✅ Palette colori vintage
-- ✅ Font monospace stile terminal
-- ✅ Pattern geometrici e gradienti
-- ✅ Responsive design
+### Installazione
+```bash
+# Clona il repository
+git clone <repository-url>
+cd skateboard-ecommerce
 
-## 🎯 Collezionisti di Esempio
+# Installa le dipendenze
+npm install
 
-L'app include diversi profili autentici:
+# Avvia il server di sviluppo
+npm run dev
 
-1. **Marco 'Bones' Rossi** (35) - Specialista Powell Peralta e Bones Brigade
-2. **Lucia 'Thrash' Bianchi** (28) - Collezionista punk rock e DIY graphics
-3. **Tony 'Hawk Eye' Verde** (42) - Veterano Santa Cruz e Independent
-4. **Spike 'Ripper' Neri** (30) - Hardcore punk skater underground
+# Oppure avvia in produzione
+npm start
+```
 
-## 🔮 Mood e Atmosfera
+### Avvio del Frontend
+```bash
+# In un terminale separato, avvia il server frontend
+npm run client
+```
 
-### Estetica Vintage Punk Rock
-- **Colori**: Neon cyan, magenta shock, nero profondo
-- **Tipografia**: Courier New monospace, stile terminal
-- **Elementi**: Gradienti, pattern geometrici, effetti glow
-- **Animazioni**: Pulse, slide, rotate per un feel dinamico
-- **Mood**: Underground, autentico, nostalgico ma moderno
+## 🌐 URL e Accessi
 
-### Linguaggio e Cultura
-- Slang skater autentico anni '80-'90
-- Riferimenti a brands iconici (Powell Peralta, Santa Cruz, etc.)
-- Terminologia tecnica del collezionismo
-- Atmosfera di community underground
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000/api
+- **Panel Admin**: http://localhost:3000/admin.html
 
-## 🎸 Brands e Riferimenti Culturali
+### Account Demo
+- **Admin**: admin@skateshop.com / admin123
+- **Utente**: user@example.com / user123
 
-### Brands Iconici Presenti
-- **Powell Peralta**: Bones Brigade, Tony Hawk, Rodney Mullen
-- **Santa Cruz**: Screaming Hand, Rob Roskopp
-- **Independent**: Truck leggendari Stage 1
-- **Suicidal Tendencies**: Crossover thrash metal
-- **Vision Street Wear**: Stile punk rock
-- **Zorlac**: Grafiche horror metal
-- **H-Street**: Street skating underground
-- **World Industries**: Controversial graphics
+## 📋 API Endpoints
 
-### Cultura Punk Rock
-- DIY (Do It Yourself) attitude
-- Zines e fotografia underground
-- Musica hardcore punk e thrash metal
-- Estetica controculturale anni '80-'90
+### Autenticazione
+- `POST /api/auth/register` - Registrazione utente
+- `POST /api/auth/login` - Login utente
 
-## 📝 Note Tecniche
+### Prodotti
+- `GET /api/products` - Lista prodotti (con filtri)
+- `GET /api/products/:id` - Dettagli prodotto
 
-- Dati simulati e memorizzati in memoria
-- Risposte automatiche generate dinamicamente
-- Status online aggiornato casualmente
-- Upload immagini con preview e modal
-- App completamente client-side
-- Design responsive per mobile e desktop
+### Carrello (Autenticazione richiesta)
+- `GET /api/cart` - Visualizza carrello
+- `POST /api/cart/add` - Aggiungi al carrello
+- `PUT /api/cart/update/:itemId` - Aggiorna quantità
+- `DELETE /api/cart/remove/:itemId` - Rimuovi dal carrello
 
-## 🎨 Palette Colori Cyberpunk
+### Ordini (Autenticazione richiesta)
+- `POST /api/orders` - Crea ordine
+- `GET /api/orders` - Lista ordini utente
+- `GET /api/orders/:id` - Dettagli ordine
 
-- **Primario**: #00ffff (Cyan neon)
-- **Secondario**: #ff0066 (Magenta shock)
-- **Accento**: #333333 (Grigio scuro)
-- **Sfondo**: #1a1a1a (Nero profondo)
-- **Testo**: #ffffff (Bianco puro)
+### Admin (Solo amministratori)
+- `GET /api/admin/orders` - Tutti gli ordini
+- `PUT /api/admin/orders/:id/status` - Aggiorna stato ordine
+- `POST /api/admin/products` - Crea prodotto
+- `PUT /api/admin/products/:id` - Aggiorna prodotto
+- `DELETE /api/admin/products/:id` - Elimina prodotto
 
-Entra nel mondo underground del collezionismo skateboard vintage! 🤘🛹⚡
+## 🎨 Design e UX
+
+### Palette Colori
+- **Primario**: Neon Cyan (#00ffff)
+- **Secondario**: Hot Pink (#ff0066)
+- **Sfondo**: Dark Gray (#0f0f0f, #1a1a1a)
+- **Testo**: White (#fff), Light Gray (#ccc)
+
+### Tipografia
+- **Principale**: Inter, system fonts
+- **Monospace**: Courier New (per elementi tech)
+
+### Animazioni
+- Transizioni fluide (0.3s ease)
+- Hover effects con transform e box-shadow
+- Loading spinners e feedback visivi
+- Animazioni di ingresso per contenuti dinamici
+
+## 📱 Responsive Design
+
+- **Desktop**: Layout a griglia completo
+- **Tablet**: Layout adattivo con menu collassabile
+- **Mobile**: Stack verticale, menu hamburger, carrello full-screen
+
+## 🔒 Sicurezza
+
+- Hash delle password con bcrypt
+- Token JWT con scadenza
+- Validazione input lato server
+- Protezione routes admin
+- CORS configurato correttamente
+
+## 🚀 Funzionalità Avanzate
+
+### Filtri e Ricerca
+- Filtro per categoria
+- Filtro per brand
+- Ordinamento (prezzo, rating, data)
+- Ricerca testuale
+
+### Gestione Stock
+- Controllo disponibilità
+- Indicatori stock basso
+- Aggiornamento automatico dopo ordini
+
+### Sistema Notifiche
+- Feedback visivo per azioni utente
+- Notifiche di successo/errore
+- Auto-dismiss dopo 5 secondi
+
+### Carrello Avanzato
+- Persistenza per utenti loggati
+- Aggiornamento quantità in tempo reale
+- Calcolo totale dinamico
+- Rimozione prodotti
+
+## 📊 Metriche Dashboard Admin
+
+- Totale prodotti
+- Totale ordini
+- Numero utenti registrati
+- Fatturato totale
+- Ordini in attesa
+- Prodotti con stock basso
+
+## 🔄 Stati Ordini
+
+- **Pending**: In attesa di elaborazione
+- **Processing**: In elaborazione
+- **Shipped**: Spedito
+- **Delivered**: Consegnato
+- **Cancelled**: Annullato
+
+## 🎯 Prossimi Sviluppi
+
+- Integrazione pagamenti reali (Stripe/PayPal)
+- Sistema recensioni prodotti
+- Wishlist utenti
+- Newsletter e email marketing
+- Analytics avanzati
+- Chat supporto clienti
+- Sistema coupon e sconti
+- Multi-lingua
+- PWA (Progressive Web App)
+
+## 🤝 Contributi
+
+Il progetto è aperto a contributi! Per contribuire:
+
+1. Fork del repository
+2. Crea un branch per la feature
+3. Commit delle modifiche
+4. Push al branch
+5. Apri una Pull Request
+
+## 📄 Licenza
+
+Questo progetto è rilasciato sotto licenza MIT. Vedi il file LICENSE per dettagli.
+
+## 🆘 Supporto
+
+Per supporto o domande:
+- Apri una issue su GitHub
+- Contatta il team di sviluppo
+- Consulta la documentazione API
 
 ---
 
-*"Skate or Die! Keep the underground spirit alive!"* 💀🔥
+**SkateShop Pro** - Il tuo negozio di skateboard online completo! 🛹✨
