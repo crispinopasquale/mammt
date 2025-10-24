@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoveChat - App di Incontri</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar with matches -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-heart"></i> LoveChat</h2>
+                <button class="new-match-btn" onclick="findNewMatch()">
+                    <i class="fas fa-search"></i> Trova Match
+                </button>
+            </div>
+            
+            <div class="matches-list" id="matchesList">
+                <!-- Matches will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main chat area -->
+        <div class="main-chat">
+            <div class="chat-header" id="chatHeader">
+                <div class="profile-info">
+                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face" 
+                         alt="Profile" class="profile-pic" id="currentProfilePic">
+                    <div class="profile-details">
+                        <h3 id="currentProfileName">Seleziona una conversazione</h3>
+                        <span class="online-status" id="onlineStatus">Offline</span>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="action-btn" onclick="showProfile()">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <button class="action-btn" onclick="videoCall()">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="action-btn" onclick="phoneCall()">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <i class="fas fa-heart"></i>
+                    <h3>Benvenuto in LoveChat!</h3>
+                    <p>Seleziona una conversazione dalla lista o trova nuovi match per iniziare a chattare.</p>
+                </div>
+            </div>
+
+            <div class="chat-input-container" id="chatInputContainer">
+                <div class="chat-input">
+                    <button class="emoji-btn" onclick="toggleEmojiPicker()">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                    <input type="text" id="messageInput" placeholder="Scrivi un messaggio..." 
+                           onkeypress="handleKeyPress(event)">
+                    <button class="attach-btn" onclick="attachFile()">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile modal -->
+        <div class="modal" id="profileModal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <div class="profile-modal-content" id="profileModalContent">
+                    <!-- Profile details will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- New match modal -->
+        <div class="modal" id="newMatchModal">
+            <div class="modal-content">
+                <span class="close" onclick="closeNewMatchModal()">&times;</span>
+                <div class="new-match-content">
+                    <h2>Nuovo Match!</h2>
+                    <div class="match-card" id="newMatchCard">
+                        <!-- New match details will be populated by JavaScript -->
+                    </div>
+                    <div class="match-actions">
+                        <button class="reject-btn" onclick="rejectMatch()">
+                            <i class="fas fa-times"></i> Rifiuta
+                        </button>
+                        <button class="like-btn" onclick="acceptMatch()">
+                            <i class="fas fa-heart"></i> Mi Piace
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emoji picker -->
+        <div class="emoji-picker" id="emojiPicker">
+            <div class="emoji-grid">
+                <span onclick="addEmoji('😀')">😀</span>
+                <span onclick="addEmoji('😍')">😍</span>
+                <span onclick="addEmoji('🥰')">🥰</span>
+                <span onclick="addEmoji('😘')">😘</span>
+                <span onclick="addEmoji('❤️')">❤️</span>
+                <span onclick="addEmoji('💕')">💕</span>
+                <span onclick="addEmoji('🔥')">🔥</span>
+                <span onclick="addEmoji('✨')">✨</span>
+                <span onclick="addEmoji('🎉')">🎉</span>
+                <span onclick="addEmoji('👍')">👍</span>
+                <span onclick="addEmoji('😂')">😂</span>
+                <span onclick="addEmoji('🤔')">🤔</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
